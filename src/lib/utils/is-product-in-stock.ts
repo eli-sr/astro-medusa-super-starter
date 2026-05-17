@@ -1,19 +1,19 @@
 export const isProductInStock = (productVariant: {
-  manage_inventory: boolean | null;
-  allow_backorder: boolean | null;
-  inventory_quantity?: number | null;
+  manage_inventory: boolean | null
+  allow_backorder: boolean | null
+  inventory_quantity?: number | null
 }) => {
   if (!productVariant.manage_inventory) {
-    return true;
+    return true
   }
 
   if (productVariant.allow_backorder) {
-    return true;
+    return true
   }
 
   if (productVariant.manage_inventory && productVariant.inventory_quantity) {
-    return true;
+    return true
   }
 
-  return false;
-};
+  return false
+}

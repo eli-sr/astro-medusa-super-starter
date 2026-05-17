@@ -1,28 +1,28 @@
 ---
-import Layout from "@layouts/Layout.astro";
-import { getRegion } from "@lib/data/regions";
-import { listProducts } from "@lib/data/products";
-import { getRegionParams } from "@lib/params/region-params";
-import ProductPreview from "@modules/products/components/product-preview/ProductPreview.astro";
+import Layout from '@layouts/Layout.astro'
+import { getRegion } from '@lib/data/regions'
+import { listProducts } from '@lib/data/products'
+import { getRegionParams } from '@lib/params/region-params'
+import ProductPreview from '@modules/products/components/product-preview/ProductPreview.astro'
 
-export const getStaticPaths = getRegionParams;
+export const getStaticPaths = getRegionParams
 
-const { countryCode } = Astro.params;
+const { countryCode } = Astro.params
 
-const region = await getRegion(countryCode);
+const region = await getRegion(countryCode)
 
 if (!region) {
-  return Astro.redirect("/not-found");
+  return Astro.redirect('/not-found')
 }
 
-let products: Awaited<ReturnType<typeof listProducts>> = [];
-let error: Error | undefined;
+let products: Awaited<ReturnType<typeof listProducts>> = []
+let error: Error | undefined
 
 try {
-  products = await listProducts(region.id);
+  products = await listProducts(region.id)
 } catch (e) {
-  error = e instanceof Error ? e : new Error("Unknown error");
-  console.error(error);
+  error = e instanceof Error ? e : new Error('Unknown error')
+  console.error(error)
 }
 ---
 

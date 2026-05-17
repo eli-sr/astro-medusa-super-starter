@@ -1,44 +1,44 @@
-import { sdk } from "@lib/sdk";
-import type { HttpTypes } from "@medusajs/types";
+import { sdk } from '@lib/sdk'
+import type { HttpTypes } from '@medusajs/types'
 
-const DEFAULT_REGION = import.meta.env.DEFAULT_REGION;
+const DEFAULT_REGION = import.meta.env.DEFAULT_REGION
 
-const regionMap = new Map<string, HttpTypes.StoreRegion>();
+const regionMap = new Map<string, HttpTypes.StoreRegion>()
 
 export const listRegions = async () => {
   try {
-    const { regions } = await sdk.store.region.list();
-    return regions;
+    const { regions } = await sdk.store.region.list()
+    return regions
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to fetch regions");
+    console.error(error)
+    throw new Error('Failed to fetch regions')
   }
-};
+}
 
 export const getRegion = async (countryCode: string) => {
   try {
     if (regionMap.has(countryCode)) {
-      return regionMap.get(countryCode);
+      return regionMap.get(countryCode)
     }
 
-    const regions = await listRegions();
+    const regions = await listRegions()
 
     if (!regions) {
-      return null;
+      return null
     }
 
     regions.forEach((region) => {
       region.countries?.forEach((country) => {
-        regionMap.set(country.iso_2 ?? "", region);
-      });
-    });
+        regionMap.set(country.iso_2 ?? '', region)
+      })
+    })
 
     const region = countryCode
       ? regionMap.get(countryCode)
-      : regionMap.get(DEFAULT_REGION);
+      : regionMap.get(DEFAULT_REGION)
 
-    return region;
+    return region
   } catch {
-    return null;
+    return null
   }
-};
+}

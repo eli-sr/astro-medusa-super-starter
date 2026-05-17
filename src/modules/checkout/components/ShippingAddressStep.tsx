@@ -1,26 +1,26 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { updateCartAddress } from "@lib/stores/cart";
-import type { StoreCart } from "@medusajs/types";
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { updateCartAddress } from '@lib/stores/cart'
+import type { StoreCart } from '@medusajs/types'
+import { useEffect, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import {
   AddressFields,
   type AddressValues,
   type CheckoutFormValues,
-  type RegionCountry,
-} from "./AddressFields";
+  type RegionCountry
+} from './AddressFields'
 
 const addressSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  address: z.string().min(1, "Address is required"),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  address: z.string().min(1, 'Address is required'),
   company: z.string(),
-  postalCode: z.string().min(1, "Postal code is required"),
-  city: z.string().min(1, "City is required"),
-  country: z.string().min(1, "Country is required"),
-  province: z.string(),
-});
+  postalCode: z.string().min(1, 'Postal code is required'),
+  city: z.string().min(1, 'City is required'),
+  country: z.string().min(1, 'Country is required'),
+  province: z.string()
+})
 
 // Billing fields are bare strings — validated conditionally via superRefine
 const billingSchema = z.object({
@@ -31,89 +31,89 @@ const billingSchema = z.object({
   postalCode: z.string(),
   city: z.string(),
   country: z.string(),
-  province: z.string(),
-});
+  province: z.string()
+})
 
 const formSchema = z
   .object({
     email: z
       .string()
-      .min(1, "Email is required")
+      .min(1, 'Email is required')
       .refine(
         (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
-        "Enter a valid email address",
+        'Enter a valid email address'
       ),
     phone: z.string(),
     billingSameAsShipping: z.boolean(),
     shipping: addressSchema,
-    billing: billingSchema,
+    billing: billingSchema
   })
   .superRefine(({ billingSameAsShipping, billing }, ctx) => {
-    if (billingSameAsShipping) return;
+    if (billingSameAsShipping) return
 
     const required: [keyof typeof billing, string][] = [
-      ["firstName", "First name is required"],
-      ["lastName", "Last name is required"],
-      ["address", "Address is required"],
-      ["postalCode", "Postal code is required"],
-      ["city", "City is required"],
-      ["country", "Country is required"],
-    ];
+      ['firstName', 'First name is required'],
+      ['lastName', 'Last name is required'],
+      ['address', 'Address is required'],
+      ['postalCode', 'Postal code is required'],
+      ['city', 'City is required'],
+      ['country', 'Country is required']
+    ]
 
     for (const [field, message] of required) {
       if (!billing[field].trim()) {
-        ctx.addIssue({ code: "custom", path: ["billing", field], message });
+        ctx.addIssue({ code: 'custom', path: ['billing', field], message })
       }
     }
-  });
+  })
 
 const EMPTY_ADDRESS: AddressValues = {
-  firstName: "",
-  lastName: "",
-  address: "",
-  company: "",
-  postalCode: "",
-  city: "",
-  country: "",
-  province: "",
-};
+  firstName: '',
+  lastName: '',
+  address: '',
+  company: '',
+  postalCode: '',
+  city: '',
+  country: '',
+  province: ''
+}
 
 function mapAddress(
-  addr?: StoreCart["shipping_address"] | null,
+  addr?: StoreCart['shipping_address'] | null
 ): AddressValues {
   return {
-    firstName: addr?.first_name ?? "",
-    lastName: addr?.last_name ?? "",
-    address: addr?.address_1 ?? "",
-    company: addr?.company ?? "",
-    postalCode: addr?.postal_code ?? "",
-    city: addr?.city ?? "",
-    country: addr?.country_code ?? "",
-    province: addr?.province ?? "",
-  };
+    firstName: addr?.first_name ?? '',
+    lastName: addr?.last_name ?? '',
+    address: addr?.address_1 ?? '',
+    company: addr?.company ?? '',
+    postalCode: addr?.postal_code ?? '',
+    city: addr?.city ?? '',
+    country: addr?.country_code ?? '',
+    province: addr?.province ?? ''
+  }
 }
 
 function areSameAddress(
-  a?: StoreCart["shipping_address"] | null,
-  b?: StoreCart["billing_address"] | null,
+  a?: StoreCart['shipping_address'] | null,
+  b?: StoreCart['billing_address'] | null
 ): boolean {
-  if (!a || !b) return false;
+  if (!a || !b) return false
   return (
     a.first_name === b.first_name &&
     a.last_name === b.last_name &&
     a.address_1 === b.address_1 &&
     a.postal_code === b.postal_code &&
     a.city === b.city
-  );
+  )
 }
 
 interface ShippingAddressStepProps {
-  cart: StoreCart | null;
-  countries: RegionCountry[];
-  countryCode: string;
-  mode: "edit" | "read";
-  onContinue?: () => void;
-  onEdit?: () => void;
+  cart: StoreCart | null
+  countries: RegionCountry[]
+  countryCode: string
+  mode: 'edit' | 'read'
+  onContinue?: () => void
+  onEdit?: () => void
 }
 
 const CheckCircle = () => (
@@ -133,18 +133,18 @@ const CheckCircle = () => (
       />
     </svg>
   </span>
-);
+)
 
 const ReadOnlyView = ({
   cart,
-  onEdit,
+  onEdit
 }: {
-  cart: StoreCart;
-  onEdit?: () => void;
+  cart: StoreCart
+  onEdit?: () => void
 }) => {
-  const shipping = cart.shipping_address;
-  const billing = cart.billing_address;
-  const isBillingSame = areSameAddress(shipping, billing);
+  const shipping = cart.shipping_address
+  const billing = cart.billing_address
+  const isBillingSame = areSameAddress(shipping, billing)
 
   const shippingLines = [
     shipping?.first_name && shipping?.last_name
@@ -154,12 +154,12 @@ const ReadOnlyView = ({
     shipping?.postal_code && shipping?.city
       ? `${shipping.postal_code}, ${shipping.city}`
       : null,
-    shipping?.country_code?.toUpperCase() ?? null,
-  ].filter(Boolean) as string[];
+    shipping?.country_code?.toUpperCase() ?? null
+  ].filter(Boolean) as string[]
 
   const billingLines = isBillingSame
     ? null
-    : [
+    : ([
         billing?.first_name && billing?.last_name
           ? `${billing.first_name} ${billing.last_name}`
           : null,
@@ -167,8 +167,8 @@ const ReadOnlyView = ({
         billing?.postal_code && billing?.city
           ? `${billing.postal_code}, ${billing.city}`
           : null,
-        billing?.country_code?.toUpperCase() ?? null,
-      ].filter(Boolean) as string[];
+        billing?.country_code?.toUpperCase() ?? null
+      ].filter(Boolean) as string[])
 
   return (
     <div>
@@ -217,8 +217,8 @@ const ReadOnlyView = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export const ShippingAddressStep = ({
   cart,
@@ -226,53 +226,53 @@ export const ShippingAddressStep = ({
   countryCode,
   mode,
   onContinue,
-  onEdit,
+  onEdit
 }: ShippingAddressStepProps) => {
-  const [submitError, setSubmitError] = useState("");
-  const cartInitialized = useRef(false);
+  const [submitError, setSubmitError] = useState('')
+  const cartInitialized = useRef(false)
 
   const {
     register,
     handleSubmit,
     watch,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting }
   } = useForm<CheckoutFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      phone: "",
+      email: '',
+      phone: '',
       billingSameAsShipping: true,
       shipping: { ...EMPTY_ADDRESS, country: countryCode },
-      billing: { ...EMPTY_ADDRESS },
-    },
-  });
+      billing: { ...EMPTY_ADDRESS }
+    }
+  })
 
   // Populate form from saved cart address on first load / after refresh
   useEffect(() => {
-    if (!cart || cartInitialized.current) return;
-    cartInitialized.current = true;
+    if (!cart || cartInitialized.current) return
+    cartInitialized.current = true
 
-    const shipping = cart.shipping_address;
-    if (!shipping?.first_name) return; // No saved address yet, keep empty defaults
+    const shipping = cart.shipping_address
+    if (!shipping?.first_name) return // No saved address yet, keep empty defaults
 
-    const billing = cart.billing_address;
+    const billing = cart.billing_address
     const billingSame =
-      !billing?.first_name || areSameAddress(shipping, billing);
+      !billing?.first_name || areSameAddress(shipping, billing)
 
     reset({
-      email: cart.email ?? "",
-      phone: shipping.phone ?? "",
+      email: cart.email ?? '',
+      phone: shipping.phone ?? '',
       billingSameAsShipping: billingSame,
       shipping: mapAddress(shipping),
-      billing: billingSame ? mapAddress(shipping) : mapAddress(billing),
-    });
-  }, [cart, reset]);
+      billing: billingSame ? mapAddress(shipping) : mapAddress(billing)
+    })
+  }, [cart, reset])
 
-  const billingSameAsShipping = watch("billingSameAsShipping");
+  const billingSameAsShipping = watch('billingSameAsShipping')
 
   const onSubmit = async (data: CheckoutFormValues) => {
-    setSubmitError("");
+    setSubmitError('')
     try {
       const shippingAddress = {
         first_name: data.shipping.firstName,
@@ -283,8 +283,8 @@ export const ShippingAddressStep = ({
         city: data.shipping.city,
         country_code: data.shipping.country,
         province: data.shipping.province || undefined,
-        phone: data.phone || undefined,
-      };
+        phone: data.phone || undefined
+      }
 
       await updateCartAddress({
         email: data.email,
@@ -299,19 +299,19 @@ export const ShippingAddressStep = ({
               postal_code: data.billing.postalCode,
               city: data.billing.city,
               country_code: data.billing.country,
-              province: data.billing.province || undefined,
-            },
-      });
+              province: data.billing.province || undefined
+            }
+      })
 
-      onContinue?.();
+      onContinue?.()
     } catch (error) {
-      console.error("Failed to update shipping address:", error);
-      setSubmitError("Failed to save address. Please try again.");
+      console.error('Failed to update shipping address:', error)
+      setSubmitError('Failed to save address. Please try again.')
     }
-  };
+  }
 
-  if (mode === "read" && cart) {
-    return <ReadOnlyView cart={cart} onEdit={onEdit} />;
+  if (mode === 'read' && cart) {
+    return <ReadOnlyView cart={cart} onEdit={onEdit} />
   }
 
   return (
@@ -330,10 +330,12 @@ export const ShippingAddressStep = ({
         <label className="flex items-center gap-2 cursor-pointer select-none">
           <input
             type="checkbox"
-            {...register("billingSameAsShipping")}
+            {...register('billingSameAsShipping')}
             className="w-4 h-4 accent-black"
           />
-          <span className="text-sm">Billing address same as shipping address</span>
+          <span className="text-sm">
+            Billing address same as shipping address
+          </span>
         </label>
 
         {/* Email / Phone */}
@@ -342,20 +344,20 @@ export const ShippingAddressStep = ({
             <input
               type="email"
               placeholder="Email*"
-              {...register("email")}
+              {...register('email')}
               className={`w-full border rounded px-4 py-3 text-sm outline-none focus:border-gray-500 transition-colors ${
-                errors.email ? "border-red-400" : "border-gray-300"
+                errors.email ? 'border-red-400' : 'border-gray-300'
               }`}
             />
             <p className="text-red-500 text-xs mt-1 min-h-4">
-              {errors.email?.message ?? ""}
+              {errors.email?.message ?? ''}
             </p>
           </div>
           <div>
             <input
               type="tel"
               placeholder="Phone"
-              {...register("phone")}
+              {...register('phone')}
               className="w-full border border-gray-300 rounded px-4 py-3 text-sm outline-none focus:border-gray-500 transition-colors"
             />
             <p className="min-h-4 mt-1" />
@@ -375,18 +377,16 @@ export const ShippingAddressStep = ({
           </div>
         )}
 
-        {submitError && (
-          <p className="text-red-500 text-sm">{submitError}</p>
-        )}
+        {submitError && <p className="text-red-500 text-sm">{submitError}</p>}
 
         <button
           type="submit"
           disabled={isSubmitting}
           className="bg-black text-white py-3 px-8 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? "Saving..." : "Continue to delivery"}
+          {isSubmitting ? 'Saving...' : 'Continue to delivery'}
         </button>
       </div>
     </form>
-  );
-};
+  )
+}

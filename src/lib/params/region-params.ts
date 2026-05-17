@@ -1,34 +1,34 @@
-import { sdk } from "../sdk";
+import { sdk } from '../sdk'
 
 interface RegionParams {
   params: {
-    countryCode: string;
-  };
+    countryCode: string
+  }
 }
 
 export const getRegionParams = async () => {
   try {
-    const { regions } = await sdk.store.region.list();
+    const { regions } = await sdk.store.region.list()
 
-    let paths: RegionParams[] = [];
+    let paths: RegionParams[] = []
 
     regions.forEach((region) => {
       region.countries?.forEach((country) => {
         if (!country.iso_2) {
-          return;
+          return
         }
 
         paths.push({
           params: {
-            countryCode: country.iso_2.toLowerCase(),
-          },
-        });
-      });
-    });
+            countryCode: country.iso_2.toLowerCase()
+          }
+        })
+      })
+    })
 
-    return paths;
+    return paths
   } catch (error) {
-    console.error(error);
-    return [];
+    console.error(error)
+    return []
   }
-};
+}

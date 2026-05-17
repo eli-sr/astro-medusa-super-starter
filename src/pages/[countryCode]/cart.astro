@@ -1,17 +1,21 @@
 ---
-import Layout from "@layouts/Layout.astro";
-import { getRegionParams } from "@lib/params/region-params";
-import { CartPage } from "@modules/cart/components/CartPage";
+import Layout from '@layouts/Layout.astro'
+import { getRegionParams } from '@lib/params/region-params'
+import { CartPage } from '@modules/cart/components/CartPage'
 
-export const getStaticPaths = getRegionParams;
+export const getStaticPaths = getRegionParams
 
-const { countryCode } = Astro.params;
+const { countryCode } = Astro.params
 
 if (!countryCode) {
-  return Astro.redirect("/not-found");
+  return Astro.redirect('/not-found')
 }
 ---
 
-<Layout title="Cart" description="Review the items in your shopping cart." noindex>
+<Layout
+  title="Cart"
+  description="Review the items in your shopping cart."
+  noindex
+>
   <CartPage client:load countryCode={countryCode} />
 </Layout>

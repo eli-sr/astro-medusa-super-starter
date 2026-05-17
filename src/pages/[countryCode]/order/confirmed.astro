@@ -1,13 +1,17 @@
 ---
-import Layout from "@layouts/Layout.astro";
-import { getRegionParams } from "@lib/params/region-params";
-import { ConfirmedFallbackPage } from "@modules/order/components/ConfirmedFallbackPage";
+import Layout from '@layouts/Layout.astro'
+import { getRegionParams } from '@lib/params/region-params'
+import { ConfirmedFallbackPage } from '@modules/order/components/ConfirmedFallbackPage'
 
-export const getStaticPaths = getRegionParams;
+export const getStaticPaths = getRegionParams
 
-const { countryCode } = Astro.params;
+const { countryCode } = Astro.params
 ---
 
-<Layout title="Order Confirmed" description="Your order has been confirmed." noindex>
+<Layout
+  title="Order Confirmed"
+  description="Your order has been confirmed."
+  noindex
+>
   <ConfirmedFallbackPage client:load countryCode={countryCode!} />
 </Layout>

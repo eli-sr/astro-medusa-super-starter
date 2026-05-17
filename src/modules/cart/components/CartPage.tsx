@@ -1,40 +1,36 @@
-import {
-  $cart,
-  removeFromCart,
-  updateLineItemQuantity,
-} from "@lib/stores/cart";
-import { convertToLocale } from "@lib/utils/money";
-import { useStore } from "@nanostores/react";
+import { $cart, removeFromCart, updateLineItemQuantity } from '@lib/stores/cart'
+import { convertToLocale } from '@lib/utils/money'
+import { useStore } from '@nanostores/react'
 
 interface CartPageProps {
-  countryCode: string;
+  countryCode: string
 }
 
 export const CartPage = ({ countryCode }: CartPageProps) => {
-  const cart = useStore($cart);
+  const cart = useStore($cart)
 
   const handleRemoveItem = async (lineItemId: string) => {
     try {
-      await removeFromCart(lineItemId);
+      await removeFromCart(lineItemId)
     } catch (error) {
-      console.error("Failed to remove item:", error);
+      console.error('Failed to remove item:', error)
     }
-  };
+  }
 
   const handleQuantityChange = async (
     lineItemId: string,
-    newQuantity: number,
+    newQuantity: number
   ) => {
     try {
-      await updateLineItemQuantity(lineItemId, newQuantity);
+      await updateLineItemQuantity(lineItemId, newQuantity)
     } catch (error) {
-      console.error("Failed to update quantity:", error);
+      console.error('Failed to update quantity:', error)
     }
-  };
+  }
 
-  const itemCount = cart?.items?.length ?? 0;
-  const isEmpty = itemCount === 0;
-  const currencyCode = cart?.currency_code || "USD";
+  const itemCount = cart?.items?.length ?? 0
+  const isEmpty = itemCount === 0
+  const currencyCode = cart?.currency_code || 'USD'
 
   return (
     <div className="max-w-7xl mx-auto px-8 py-8">
@@ -68,12 +64,12 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
               {cart?.items?.map((item) => {
                 const thumbnailUrl =
                   item.variant?.product?.thumbnail ||
-                  item.variant?.product?.images?.[0]?.url;
-                const productTitle = item.variant?.product?.title || "Product";
-                const variantTitle = item.variant?.title || "";
-                const unitPrice = item.unit_price || 0;
-                const quantity = item.quantity || 1;
-                const lineTotal = unitPrice * quantity;
+                  item.variant?.product?.images?.[0]?.url
+                const productTitle = item.variant?.product?.title || 'Product'
+                const variantTitle = item.variant?.title || ''
+                const unitPrice = item.unit_price || 0
+                const quantity = item.quantity || 1
+                const lineTotal = unitPrice * quantity
 
                 return (
                   <div
@@ -117,7 +113,7 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
                           onChange={(e) =>
                             handleQuantityChange(
                               item.id,
-                              parseInt(e.target.value, 10),
+                              parseInt(e.target.value, 10)
                             )
                           }
                           className="w-16 px-2 py-1 border border-gray-300 rounded text-center"
@@ -128,7 +124,7 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
                               <option key={num} value={num}>
                                 {num}
                               </option>
-                            ),
+                            )
                           )}
                         </select>
                         <button
@@ -147,7 +143,7 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
                     <div className="col-span-3 md:col-span-2 text-right text-sm">
                       {convertToLocale({
                         amount: unitPrice,
-                        currencyCode,
+                        currencyCode
                       })}
                     </div>
 
@@ -155,7 +151,7 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
                     <div className="col-span-3 md:col-span-2 text-right font-medium">
                       {convertToLocale({
                         amount: lineTotal,
-                        currencyCode,
+                        currencyCode
                       })}
                     </div>
 
@@ -182,7 +178,7 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
                       </button>
                     </div>
                   </div>
-                );
+                )
               })}
             </div>
           </div>
@@ -201,7 +197,7 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
                     <span>
                       {convertToLocale({
                         amount: cart?.item_subtotal || 0,
-                        currencyCode,
+                        currencyCode
                       })}
                     </span>
                   </div>
@@ -211,7 +207,7 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
                     <span>
                       {convertToLocale({
                         amount: cart?.shipping_total || 0,
-                        currencyCode,
+                        currencyCode
                       })}
                     </span>
                   </div>
@@ -221,7 +217,7 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
                     <span>
                       {convertToLocale({
                         amount: cart?.tax_total || 0,
-                        currencyCode,
+                        currencyCode
                       })}
                     </span>
                   </div>
@@ -232,7 +228,7 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
                       <span>
                         {convertToLocale({
                           amount: cart?.total || 0,
-                          currencyCode,
+                          currencyCode
                         })}
                       </span>
                     </div>
@@ -251,5 +247,5 @@ export const CartPage = ({ countryCode }: CartPageProps) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

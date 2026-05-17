@@ -2,67 +2,67 @@ import {
   $cart,
   $isCartSidebarOpen,
   closeCartSidebar,
-  removeFromCart,
-} from "@lib/stores/cart";
-import { convertToLocale } from "@lib/utils/money";
-import { useStore } from "@nanostores/react";
-import { useEffect, useRef } from "react";
+  removeFromCart
+} from '@lib/stores/cart'
+import { convertToLocale } from '@lib/utils/money'
+import { useStore } from '@nanostores/react'
+import { useEffect, useRef } from 'react'
 
 interface CartSidebarProps {
-  countryCode: string;
+  countryCode: string
 }
 
 export const CartSidebar = ({ countryCode }: CartSidebarProps) => {
-  const cart = useStore($cart);
-  const isOpen = useStore($isCartSidebarOpen);
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const backdropRef = useRef<HTMLDivElement>(null);
+  const cart = useStore($cart)
+  const isOpen = useStore($isCartSidebarOpen)
+  const sidebarRef = useRef<HTMLDivElement>(null)
+  const backdropRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        closeCartSidebar();
+      if (e.key === 'Escape' && isOpen) {
+        closeCartSidebar()
       }
-    };
+    }
 
     if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
+      document.addEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = "";
+      document.body.style.overflow = ''
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
 
   useEffect(() => {
     if (isOpen && sidebarRef.current) {
       const firstFocusable = sidebarRef.current.querySelector(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-      ) as HTMLElement;
-      firstFocusable?.focus();
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ) as HTMLElement
+      firstFocusable?.focus()
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === backdropRef.current) {
-      closeCartSidebar();
+      closeCartSidebar()
     }
-  };
+  }
 
   const handleRemoveItem = async (lineItemId: string) => {
     try {
-      await removeFromCart(lineItemId);
+      await removeFromCart(lineItemId)
     } catch (error) {
-      console.error("Failed to remove item:", error);
+      console.error('Failed to remove item:', error)
     }
-  };
+  }
 
-  const itemCount = cart?.items?.length ?? 0;
-  const isEmpty = itemCount === 0;
+  const itemCount = cart?.items?.length ?? 0
+  const isEmpty = itemCount === 0
 
   return (
     <>
@@ -71,7 +71,7 @@ export const CartSidebar = ({ countryCode }: CartSidebarProps) => {
         ref={backdropRef}
         onClick={handleBackdropClick}
         className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${
-          isOpen ? "opacity-50" : "opacity-0 pointer-events-none"
+          isOpen ? 'opacity-50' : 'opacity-0 pointer-events-none'
         }`}
         aria-hidden="true"
       />
@@ -83,7 +83,7 @@ export const CartSidebar = ({ countryCode }: CartSidebarProps) => {
         aria-modal="true"
         aria-label="Shopping cart"
         className={`fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-xl transform transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
@@ -117,12 +117,11 @@ export const CartSidebar = ({ countryCode }: CartSidebarProps) => {
                 {cart?.items?.map((item) => {
                   const thumbnailUrl =
                     item.variant?.product?.thumbnail ||
-                    item.variant?.product?.images?.[0]?.url;
-                  const productTitle =
-                    item.variant?.product?.title || "Product";
-                  const variantTitle = item.variant?.title || "";
-                  const unitPrice = item.unit_price || 0;
-                  const currencyCode = cart.currency_code || "USD";
+                    item.variant?.product?.images?.[0]?.url
+                  const productTitle = item.variant?.product?.title || 'Product'
+                  const variantTitle = item.variant?.title || ''
+                  const unitPrice = item.unit_price || 0
+                  const currencyCode = cart.currency_code || 'USD'
 
                   return (
                     <div
@@ -160,7 +159,7 @@ export const CartSidebar = ({ countryCode }: CartSidebarProps) => {
                           <p className="text-sm font-medium">
                             {convertToLocale({
                               amount: unitPrice,
-                              currencyCode,
+                              currencyCode
                             })}
                           </p>
                           <button
@@ -186,7 +185,7 @@ export const CartSidebar = ({ countryCode }: CartSidebarProps) => {
                         </div>
                       </div>
                     </div>
-                  );
+                  )
                 })}
               </div>
             )}
@@ -200,7 +199,7 @@ export const CartSidebar = ({ countryCode }: CartSidebarProps) => {
                 <span className="font-medium">
                   {convertToLocale({
                     amount: cart?.item_subtotal || 0,
-                    currencyCode: cart?.currency_code || "USD",
+                    currencyCode: cart?.currency_code || 'USD'
                   })}
                 </span>
               </div>
@@ -216,5 +215,5 @@ export const CartSidebar = ({ countryCode }: CartSidebarProps) => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}

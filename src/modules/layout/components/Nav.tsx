@@ -2,29 +2,29 @@ import {
   $cartItemCount,
   $regionId,
   initCart,
-  toggleCartSidebar,
-} from "@lib/stores/cart";
-import { useStore } from "@nanostores/react";
-import { useEffect } from "react";
+  toggleCartSidebar
+} from '@lib/stores/cart'
+import { useStore } from '@nanostores/react'
+import { useEffect } from 'react'
 
 interface NavProps {
-  countryCode: string;
-  regionId: string | null;
+  countryCode: string
+  regionId: string | null
 }
 
 export const Nav = ({ countryCode, regionId }: NavProps) => {
-  const cartItemCount = useStore($cartItemCount);
+  const cartItemCount = useStore($cartItemCount)
 
   useEffect(() => {
     if (regionId) {
-      $regionId.set(regionId);
-      initCart();
+      $regionId.set(regionId)
+      initCart()
     }
-  }, [regionId]);
+  }, [regionId])
 
   const handleCartClick = () => {
-    toggleCartSidebar();
-  };
+    toggleCartSidebar()
+  }
 
   return (
     <header className="flex items-center w-full p-8 h-24">
@@ -45,7 +45,7 @@ export const Nav = ({ countryCode, regionId }: NavProps) => {
         <button
           onClick={handleCartClick}
           className="text-sm hover:underline relative"
-          aria-label={`Shopping cart with ${cartItemCount} item${cartItemCount !== 1 ? "s" : ""}`}
+          aria-label={`Shopping cart with ${cartItemCount} item${cartItemCount !== 1 ? 's' : ''}`}
         >
           <span aria-live="polite" aria-atomic="true">
             Cart ({cartItemCount})
@@ -53,5 +53,5 @@ export const Nav = ({ countryCode, regionId }: NavProps) => {
         </button>
       </div>
     </header>
-  );
-};
+  )
+}

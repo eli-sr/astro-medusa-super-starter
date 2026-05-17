@@ -1,16 +1,16 @@
 ---
 interface Props {
-  material?: string | null;
-  origin_country?: string | null;
-  type?: { value: string } | null;
-  weight?: number | null;
-  length?: number | null;
-  width?: number | null;
-  height?: number | null;
+  material?: string | null
+  origin_country?: string | null
+  type?: { value: string } | null
+  weight?: number | null
+  length?: number | null
+  width?: number | null
+  height?: number | null
 }
 
 const { material, origin_country, type, weight, length, width, height } =
-  Astro.props;
+  Astro.props
 ---
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -18,22 +18,22 @@ const { material, origin_country, type, weight, length, width, height } =
     <div class="flex flex-col gap-y-4">
       <div>
         <span class="font-semibold">Material</span>
-        <p>{material || "-"}</p>
+        <p>{material || '-'}</p>
       </div>
       <div>
         <span class="font-semibold">Country of origin</span>
-        <p>{origin_country || "-"}</p>
+        <p>{origin_country || '-'}</p>
       </div>
       <div>
         <span class="font-semibold">Type</span>
-        <p>{type?.value || "-"}</p>
+        <p>{type?.value || '-'}</p>
       </div>
     </div>
 
     <div class="flex flex-col gap-y-4">
       <div>
         <span class="font-semibold">Weight</span>
-        <p>{weight ? `${weight}g` : "-"}</p>
+        <p>{weight ? `${weight}g` : '-'}</p>
       </div>
       <div>
         <span class="font-semibold">Dimensions</span>
@@ -41,7 +41,7 @@ const { material, origin_country, type, weight, length, width, height } =
           {
             length && width && height
               ? `${length}L x ${width}W x ${height}H`
-              : "-"
+              : '-'
           }
         </p>
       </div>

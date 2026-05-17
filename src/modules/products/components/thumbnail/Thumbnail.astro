@@ -1,14 +1,14 @@
 ---
-import { Image } from "astro:assets";
-import PlaceholderImage from "./PlaceholderImage.astro";
+import { Image } from 'astro:assets'
+import PlaceholderImage from './PlaceholderImage.astro'
 
 interface Props {
-  imageUrl?: string;
-  title: string;
-  priority?: boolean;
+  imageUrl?: string
+  title: string
+  priority?: boolean
 }
 
-const { imageUrl, title, priority = false } = Astro.props;
+const { imageUrl, title, priority = false } = Astro.props
 ---
 
 <div
@@ -26,8 +26,8 @@ const { imageUrl, title, priority = false } = Astro.props;
           sizes="(max-width: 768px) 50vw, (max-width: 1536px) 33vw, 25vw"
           format="webp"
           quality={45}
-          loading={priority ? "eager" : "lazy"}
-          fetchpriority={priority ? "high" : "auto"}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchpriority={priority ? 'high' : 'auto'}
         />
       ) : (
         <PlaceholderImage size={24} />

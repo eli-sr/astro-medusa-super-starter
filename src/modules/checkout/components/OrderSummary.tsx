@@ -1,12 +1,12 @@
-import { convertToLocale } from "@lib/utils/money";
-import type { StoreCart } from "@medusajs/types";
+import { convertToLocale } from '@lib/utils/money'
+import type { StoreCart } from '@medusajs/types'
 
 interface OrderSummaryProps {
-  cart: StoreCart;
+  cart: StoreCart
 }
 
 export const OrderSummary = ({ cart }: OrderSummaryProps) => {
-  const currencyCode = cart.currency_code || "USD";
+  const currencyCode = cart.currency_code || 'USD'
 
   return (
     <div className="sticky top-8">
@@ -27,7 +27,7 @@ export const OrderSummary = ({ cart }: OrderSummaryProps) => {
           <span>
             {convertToLocale({
               amount: cart.shipping_total || 0,
-              currencyCode,
+              currencyCode
             })}
           </span>
         </div>
@@ -51,12 +51,12 @@ export const OrderSummary = ({ cart }: OrderSummaryProps) => {
         {cart.items?.map((item) => {
           const thumbnailUrl =
             item.variant?.product?.thumbnail ||
-            item.variant?.product?.images?.[0]?.url;
-          const productTitle = item.variant?.product?.title || "Product";
-          const variantTitle = item.variant?.title || "";
-          const unitPrice = item.unit_price || 0;
-          const quantity = item.quantity || 1;
-          const lineTotal = unitPrice * quantity;
+            item.variant?.product?.images?.[0]?.url
+          const productTitle = item.variant?.product?.title || 'Product'
+          const variantTitle = item.variant?.title || ''
+          const unitPrice = item.unit_price || 0
+          const quantity = item.quantity || 1
+          const lineTotal = unitPrice * quantity
 
           return (
             <div key={item.id} className="flex gap-3">
@@ -80,7 +80,7 @@ export const OrderSummary = ({ cart }: OrderSummaryProps) => {
                 )}
                 <div className="flex justify-between mt-1 text-sm">
                   <span className="text-gray-500">
-                    {quantity}x{" "}
+                    {quantity}x{' '}
                     {convertToLocale({ amount: unitPrice, currencyCode })}
                   </span>
                   <span className="font-medium">
@@ -89,9 +89,9 @@ export const OrderSummary = ({ cart }: OrderSummaryProps) => {
                 </div>
               </div>
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
-};
+  )
+}
