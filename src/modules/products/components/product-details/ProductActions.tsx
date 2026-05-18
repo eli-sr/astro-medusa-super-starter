@@ -1,4 +1,3 @@
-import { sdk } from '@lib/sdk'
 import { addToCart } from '@lib/stores/cart'
 import { isProductInStock } from '@lib/utils/is-product-in-stock'
 import clsx from 'clsx'
@@ -49,13 +48,25 @@ export const ProductActions = ({
 
     async function fetchFreshVariants() {
       try {
-        const { product } = await sdk.store.product.retrieve(productId, {
-          region_id: regionId,
-          fields: '+variants.inventory_quantity,*variants.options'
-        })
+        const params = new URLSearchParams({ regionId })
+        const res = await fetch(
+          `/api/products/${productId}/variants?${params.toString()}`,
+          {
+            credentials: 'same-origin',
+            headers: {
+              'X-Requested-With': 'fetch'
+            }
+          }
+        )
 
-        if (!cancelled && product?.variants) {
-          setVariants(product.variants as Variant[])
+        if (!res.ok) {
+          throw new Error('Failed to fetch fresh variant data')
+        }
+
+        const { variants: freshVariants } = await res.json()
+
+        if (!cancelled && freshVariants) {
+          setVariants(freshVariants as Variant[])
         }
       } catch (error) {
         console.error('Failed to fetch fresh variant data:', error)

@@ -1,4 +1,3 @@
-import { sdk } from '@lib/sdk'
 import { addShippingMethod } from '@lib/stores/cart'
 import { convertToLocale } from '@lib/utils/money'
 import type {
@@ -74,8 +73,18 @@ export const DeliveryStep = ({
       setIsLoading(true)
       setError('')
       try {
-        const { shipping_options } =
-          await sdk.store.fulfillment.listCartOptions({ cart_id: cart.id })
+        const res = await fetch('/api/cart/shipping-options', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'fetch'
+          },
+          body: JSON.stringify({})
+        })
+        if (!res.ok) throw new Error('Failed to fetch shipping options')
+
+        const { shipping_options } = await res.json()
         setShippingOptions(shipping_options)
 
         // Pre-select if cart already has a shipping method
@@ -92,7 +101,7 @@ export const DeliveryStep = ({
     }
 
     fetchOptions()
-  }, [mode, cart.id])
+  }, [mode, cart.shipping_methods])
 
   const selectedOption = shippingOptions.find((o) => o.id === selectedOptionId)
   const needsLocker = selectedOption

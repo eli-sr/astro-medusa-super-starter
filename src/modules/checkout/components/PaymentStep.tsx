@@ -1,4 +1,3 @@
-import { sdk } from '@lib/sdk'
 import { completeCart, initPaymentSession } from '@lib/stores/cart'
 import type { StoreCart, StorePaymentProvider } from '@medusajs/types'
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
@@ -65,10 +64,18 @@ export const PaymentStep = ({ cart, countryCode, mode }: PaymentStepProps) => {
       setIsLoading(true)
       setError('')
       try {
-        const { payment_providers } =
-          await sdk.store.payment.listPaymentProviders({
-            region_id: cart.region_id!
-          })
+        const res = await fetch('/api/cart/payment-providers', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'fetch'
+          },
+          body: JSON.stringify({ regionId: cart.region_id })
+        })
+        if (!res.ok) throw new Error('Failed to fetch payment providers')
+
+        const { payment_providers } = await res.json()
         setPaymentProviders(payment_providers)
 
         const existingProviderId =
@@ -131,7 +138,7 @@ export const PaymentStep = ({ cart, countryCode, mode }: PaymentStepProps) => {
         window.location.href = `/${countryCode}/order/confirmed`
       } else {
         setError(
-          result.error.message || 'Failed to place order. Please try again.'
+          result.error?.message || 'Failed to place order. Please try again.'
         )
       }
     } catch (err) {

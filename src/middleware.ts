@@ -17,6 +17,8 @@ function isStaticOrInternalPath(pathname: string) {
     pathname.startsWith('/_astro/') ||
     pathname === '/_image' ||
     pathname.startsWith('/_image') ||
+    pathname === '/api' ||
+    pathname.startsWith('/api/') ||
     pathname.startsWith('/@') || // e.g. /@vite, /@id, /@fs (dev)
     pathname.startsWith('/__') // e.g. /__vite_ping (dev)
   ) {
