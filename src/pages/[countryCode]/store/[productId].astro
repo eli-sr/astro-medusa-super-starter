@@ -2,35 +2,43 @@
 import Layout from '@layouts/Layout.astro'
 import { retrieveProduct } from '@lib/data/products'
 import { getRegion } from '@lib/data/regions'
-import { getProductParams } from '@lib/params/product-params'
 import { getProductPrice } from '@lib/utils/get-product-price'
 import ImageCarouselWrapper from '@modules/products/components/product-details/image-carousel/ImageCarouselWrapper.astro'
 import { ProductActions } from '@modules/products/components/product-details/ProductActions'
 import ProductAttributes from '@modules/products/components/product-details/ProductAttributes.astro'
 
-export const getStaticPaths = getProductParams
+export const prerender = false
 
 const { countryCode, productId } = Astro.params
 
-if (!countryCode || !productId) {
-  return Astro.redirect('/not-found')
-}
-
-const region = await getRegion(countryCode)
-
-if (!region) {
-  return Astro.redirect('/not-found')
-}
-
 let product: Awaited<ReturnType<typeof retrieveProduct>> | undefined
-let error: Error | undefined
+let errorMessage: string | undefined
+let statusCode = 200
 
-try {
-  product = await retrieveProduct(productId, region.id)
-} catch (e) {
-  error = e instanceof Error ? e : new Error('Unknown error')
-  console.error(error)
+const region = countryCode ? await getRegion(countryCode) : null
+
+if (!countryCode || !productId || !region) {
+  statusCode = 404
+  errorMessage = 'Product not found'
+} else {
+  try {
+    product = await retrieveProduct(productId, region.id)
+
+    if (!product) {
+      statusCode = 404
+      errorMessage = 'Product not found'
+    }
+  } catch (e) {
+    const status = e instanceof Error && 'status' in e ? e.status : undefined
+
+    statusCode = status === 404 ? 404 : 500
+    errorMessage =
+      e instanceof Error ? e.message : 'Unable to load this product right now'
+    console.error(e)
+  }
 }
+
+Astro.response.status = statusCode
 
 const {
   title,
@@ -50,17 +58,21 @@ const {
 const { cheapestPrice } = getProductPrice({
   productVariants: variants ?? []
 })
+
+const pageTitle =
+  title ?? (statusCode === 404 ? 'Product not found' : 'Product unavailable')
 ---
 
 <Layout
-  title={title}
-  description={description ?? `Shop ${title} at the best price.`}
+  title={pageTitle}
+  description={description ?? `Shop ${pageTitle} at the best price.`}
   image={images?.[0]?.url}
   type="product"
+  noindex={statusCode !== 200}
 >
-  {error && <p class="text-red-700">{error.message}</p>}
+  {errorMessage && <p class="px-8 py-6 text-red-700 md:px-12 lg:px-16">{errorMessage}</p>}
   {
-    product && (
+    product && region && (
       <div class="grid grid-cols-1 gap-20 px-8 py-6 md:px-12 lg:grid-cols-2 lg:px-16">
         <ImageCarouselWrapper
           images={images ?? []}

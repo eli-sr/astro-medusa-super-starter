@@ -2,54 +2,60 @@
 import Layout from '@layouts/Layout.astro'
 import { getRegion } from '@lib/data/regions'
 import { listProducts } from '@lib/data/products'
-import { getRegionParams } from '@lib/params/region-params'
 import ProductPreview from '@modules/products/components/product-preview/ProductPreview.astro'
 
-export const getStaticPaths = getRegionParams
+export const prerender = false
 
 const { countryCode } = Astro.params
 
-const region = await getRegion(countryCode)
-
-if (!region) {
-  return Astro.redirect('/not-found')
-}
-
 let products: Awaited<ReturnType<typeof listProducts>> = []
-let error: Error | undefined
+let errorMessage: string | undefined
+let statusCode = 200
 
-try {
-  products = await listProducts(region.id)
-} catch (e) {
-  error = e instanceof Error ? e : new Error('Unknown error')
-  console.error(error)
+const region = countryCode ? await getRegion(countryCode) : null
+
+if (!countryCode || !region) {
+  statusCode = 404
+  errorMessage = 'Store not found'
+} else {
+  try {
+    products = await listProducts(region.id)
+  } catch (e) {
+    statusCode = 500
+    errorMessage =
+      e instanceof Error ? e.message : 'Unable to load products right now'
+    console.error(e)
+  }
 }
+
+Astro.response.status = statusCode
 ---
 
 <Layout
-  title="All Products"
+  title={statusCode === 404 ? 'Store not found' : 'All Products'}
   description="Browse our full collection of products. Find the best deals and latest arrivals."
+  noindex={statusCode !== 200}
 >
   <div class="px-8 py-6 md:px-12 lg:px-16">
     <h1 class="mb-8 text-4xl font-bold">All Products</h1>
-    {error && <p class="text-red-700">{error.message}</p>}
-    <ul
-      class="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 w-full gap-x-6 gap-y-8"
-    >
-      {
-        products?.map((product, index) => (
-          <li>
-            <ProductPreview
-              id={product.id}
-              variants={product.variants ?? []}
-              thumbnailUrl={product.thumbnail ?? undefined}
-              imageUrl={product.images?.[0]?.url}
-              title={product.title}
-              priority={index < 4}
-            />
-          </li>
-        ))
-      }
-    </ul>
+    {errorMessage && <p class="text-red-700">{errorMessage}</p>}
+    {
+      statusCode === 200 && (
+        <ul class="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 w-full gap-x-6 gap-y-8">
+          {products?.map((product, index) => (
+            <li>
+              <ProductPreview
+                id={product.id}
+                variants={product.variants ?? []}
+                thumbnailUrl={product.thumbnail ?? undefined}
+                imageUrl={product.images?.[0]?.url}
+                title={product.title}
+                priority={index < 4}
+              />
+            </li>
+          ))}
+        </ul>
+      )
+    }
   </div>
 </Layout>
