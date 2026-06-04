@@ -18,20 +18,22 @@ let statusCode = 200
 const region = countryCode ? await getRegion(countryCode) : null
 
 if (!countryCode || !productId || !region) {
-  statusCode = 404
-  errorMessage = 'Product not found'
+  return Astro.rewrite('/404')
 } else {
   try {
     product = await retrieveProduct(productId, region.id)
 
     if (!product) {
-      statusCode = 404
-      errorMessage = 'Product not found'
+      return Astro.rewrite('/404')
     }
   } catch (e) {
     const status = e instanceof Error && 'status' in e ? e.status : undefined
 
-    statusCode = status === 404 ? 404 : 500
+    if (status === 404) {
+      return Astro.rewrite('/404')
+    }
+
+    statusCode = 500
     errorMessage =
       e instanceof Error ? e.message : 'Unable to load this product right now'
     console.error(e)
@@ -60,7 +62,7 @@ const { cheapestPrice } = getProductPrice({
 })
 
 const pageTitle =
-  title ?? (statusCode === 404 ? 'Product not found' : 'Product unavailable')
+  title ?? 'Product unavailable'
 ---
 
 <Layout
