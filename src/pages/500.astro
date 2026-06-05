@@ -1,0 +1,59 @@
+---
+import '@styles/global.css'
+
+export const prerender = false
+
+Astro.response.status = 500
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>Server error | Astro + Medusa Starter</title>
+    <meta
+      name="description"
+      content="Something went wrong while loading this page."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body class="min-h-screen bg-white text-black">
+    <main class="mx-auto flex min-h-screen w-full max-w-450 flex-col">
+      <section
+        class="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-8 py-16 md:px-12 lg:px-16"
+      >
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.28em] text-black/55"
+        >
+          500
+        </p>
+        <h1
+          class="mt-4 text-4xl font-bold tracking-tight text-black md:text-5xl"
+        >
+          Something went wrong
+        </h1>
+        <p class="mt-6 max-w-xl text-base leading-8 text-black/65">
+          The store could not load this page right now. Try refreshing the page
+          or return to the catalog while the issue clears.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a
+            href="/store"
+            class="inline-flex rounded-full bg-black px-6 py-3 text-sm font-medium text-white transition hover:bg-black/85"
+          >
+            Browse products
+          </a>
+          <a
+            href="/"
+            class="inline-flex rounded-full border border-black px-6 py-3 text-sm font-medium text-black transition hover:bg-black/5"
+          >
+            Go home
+          </a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

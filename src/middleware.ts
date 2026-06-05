@@ -30,7 +30,11 @@ function isStaticOrInternalPath(pathname: string) {
     pathname === '/favicon.ico' ||
     pathname === '/robots.txt' ||
     pathname === '/sitemap.xml' ||
-    pathname === '/manifest.webmanifest'
+    pathname === '/manifest.webmanifest' ||
+    pathname === '/404' ||
+    pathname === '/404/' ||
+    pathname === '/500' ||
+    pathname === '/500/'
   ) {
     return true
   }

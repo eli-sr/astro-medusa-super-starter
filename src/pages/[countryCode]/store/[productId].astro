@@ -12,35 +12,28 @@ export const prerender = false
 const { countryCode, productId } = Astro.params
 
 let product: Awaited<ReturnType<typeof retrieveProduct>> | undefined
-let errorMessage: string | undefined
-let statusCode = 200
 
 const region = countryCode ? await getRegion(countryCode) : null
 
 if (!countryCode || !productId || !region) {
   return Astro.rewrite('/404')
-} else {
-  try {
-    product = await retrieveProduct(productId, region.id)
-
-    if (!product) {
-      return Astro.rewrite('/404')
-    }
-  } catch (e) {
-    const status = e instanceof Error && 'status' in e ? e.status : undefined
-
-    if (status === 404) {
-      return Astro.rewrite('/404')
-    }
-
-    statusCode = 500
-    errorMessage =
-      e instanceof Error ? e.message : 'Unable to load this product right now'
-    console.error(e)
-  }
 }
 
-Astro.response.status = statusCode
+try {
+  product = await retrieveProduct(productId, region.id)
+
+  if (!product) {
+    return Astro.rewrite('/404')
+  }
+} catch (e) {
+  const status = e instanceof Error && 'status' in e ? e.status : undefined
+
+  if (status === 404) {
+    return Astro.rewrite('/404')
+  }
+
+  throw e
+}
 
 const {
   title,
@@ -61,8 +54,7 @@ const { cheapestPrice } = getProductPrice({
   productVariants: variants ?? []
 })
 
-const pageTitle =
-  title ?? 'Product unavailable'
+const pageTitle = title ?? 'Product unavailable'
 ---
 
 <Layout
@@ -70,9 +62,7 @@ const pageTitle =
   description={description ?? `Shop ${pageTitle} at the best price.`}
   image={images?.[0]?.url}
   type="product"
-  noindex={statusCode !== 200}
 >
-  {errorMessage && <p class="px-8 py-6 text-red-700 md:px-12 lg:px-16">{errorMessage}</p>}
   {
     product && region && (
       <div class="grid grid-cols-1 gap-20 px-8 py-6 md:px-12 lg:grid-cols-2 lg:px-16">
